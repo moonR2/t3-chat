@@ -45,6 +45,7 @@ export default function Home() {
           <p className="text-2xl text-white">
             {hello.data ? hello.data.greeting : "Loading tRPC query..."}
           </p>
+          <p>Hola Lunita Bonita, Moonify anda en sus tutoriales locos.</p>
         </div>
       </main>
     </>
