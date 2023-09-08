@@ -1,6 +1,7 @@
 import Head from "next/head";
 import { SignInButton, SignOutButton } from "@clerk/nextjs";
 import { useUser } from "@clerk/nextjs";
+import { LoadingSpinner } from "~/components/ui/LoadingSpinner";
 
 import { type RouterOutputs, api } from "~/utils/api";
 
@@ -62,7 +63,7 @@ export default function Home() {
 
   const { data, isLoading } = api.posts.getAll.useQuery();
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <LoadingSpinner />;
 
   if (!data) return <div>Something went wrong</div>;
 
