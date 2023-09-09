@@ -2,17 +2,29 @@ import Head from "next/head";
 import { SignInButton } from "@clerk/nextjs";
 import { useUser } from "@clerk/nextjs";
 import { LoadingPage } from "~/components/ui/LoadingSpinner";
+import { Button } from "~/components/ui/button";
 
 import { type RouterOutputs, api } from "~/utils/api";
 
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import Image from "next/image";
+import { useState } from "react";
 
 dayjs.extend(relativeTime);
 
 const CreatePostWizard = () => {
   const { user } = useUser();
+  const [input, setInput] = useState<string>("");
+
+  const ctx = api.useContext();
+
+  const { mutate, isLoading: isPosting } = api.posts.create.useMutation({
+    onSuccess: () => {
+      setInput("");
+      void ctx.posts.getAll.refetch();
+    },
+  });
 
   if (!user) return null;
 
@@ -28,7 +40,17 @@ const CreatePostWizard = () => {
       <input
         className="grow bg-transparent text-white outline-none"
         placeholder="What's on your mind?"
+        type="text"
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
       />
+      <Button
+        variant={"outline"}
+        onClick={() => mutate({ content: input })}
+        disabled={isPosting}
+      >
+        Post
+      </Button>
     </div>
   );
 };
