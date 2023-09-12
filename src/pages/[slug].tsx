@@ -4,6 +4,7 @@ import { prisma } from "~/server/db";
 import superjson from "superjson";
 import { appRouter } from "~/server/api/root";
 import { PageLayout } from "~/components/ui/layout";
+import { generateSSGHelper } from "~/server/helpers/ssgHelper";
 
 import { api } from "~/utils/api";
 import { type GetStaticPropsContext, type NextPage } from "next";
@@ -50,7 +51,7 @@ const Profile: NextPage<{ username: string }> = ({ username }) => {
             className="border-3 absolute bottom-0 left-0 -mb-[64px] ml-4 rounded-full border-black bg-black"
           />
         </div>
-        <div className="h-[64px]" />
+        <div className="h-[72px]" />
         <div className="p-4 text-2xl font-bold">{`@${data.username}`}</div>
         <div className="w-full border-b border-slate-400" />
         <ProfileFeed userId={data.id} />
@@ -62,12 +63,7 @@ const Profile: NextPage<{ username: string }> = ({ username }) => {
 export const getStaticProps = async (
   context: GetStaticPropsContext<{ slug: string }>,
 ) => {
-  const helpers = createServerSideHelpers({
-    router: appRouter,
-    ctx: { prisma: prisma, userId: null },
-    transformer: superjson, // optional - adds superjson serialization
-  });
-
+  const ssg = generateSSGHelper();
   const username = context.params?.slug;
 
   if (typeof username !== "string") {
@@ -76,11 +72,11 @@ export const getStaticProps = async (
 
   const safeUsername = username.replace("@", "");
 
-  await helpers.profile.getUserByUsername.prefetch({ username: safeUsername });
+  await ssg.profile.getUserByUsername.prefetch({ username: safeUsername });
 
   return {
     props: {
-      trpcState: helpers.dehydrate(),
+      trpcState: ssg.dehydrate(),
       username: safeUsername,
     },
   };
