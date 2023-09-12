@@ -1,4 +1,4 @@
-import { SignInButton } from "@clerk/nextjs";
+import { SignInButton, SignOutButton } from "@clerk/nextjs";
 import { useUser } from "@clerk/nextjs";
 import { LoadingPage, LoadingSpinner } from "~/components/ui/LoadingSpinner";
 import { Button } from "~/components/ui/button";
@@ -109,6 +109,11 @@ export default function Home() {
     <>
       <PageLayout>
         <div className="border-b border-slate-400 p-4">
+          {isSignedIn && (
+            <div className="flex justify-center">
+              <SignOutButton />{" "}
+            </div>
+          )}
           {!isSignedIn && (
             <div className="flex justify-center">
               <SignInButton />{" "}
@@ -116,7 +121,7 @@ export default function Home() {
           )}
           {isSignedIn && <CreatePostWizard />}
         </div>
-        <Feed></Feed>
+        <Feed />
       </PageLayout>
     </>
   );
