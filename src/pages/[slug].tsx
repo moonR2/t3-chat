@@ -8,6 +8,25 @@ import { PageLayout } from "~/components/ui/layout";
 import { api } from "~/utils/api";
 import { type GetStaticPropsContext, type NextPage } from "next";
 import Image from "next/image";
+import { LoadingPage } from "~/components/ui/LoadingSpinner";
+import PostView from "~/components/PostView";
+
+const ProfileFeed = (props: { userId: string }) => {
+  const { data, isLoading } = api.posts.getPostsByUserId.useQuery({
+    userId: props.userId,
+  });
+
+  if (isLoading) return <LoadingPage />;
+
+  if (!data || data.length === 0) return <div>No posts</div>;
+  return (
+    <div className="flex flex-col">
+      {data?.map(({ post, author }) => (
+        <PostView post={post} author={author} key={post.id} />
+      ))}
+    </div>
+  );
+};
 
 const Profile: NextPage<{ username: string }> = ({ username }) => {
   const { data } = api.profile.getUserByUsername.useQuery({
@@ -34,6 +53,7 @@ const Profile: NextPage<{ username: string }> = ({ username }) => {
         <div className="h-[64px]" />
         <div className="p-4 text-2xl font-bold">{`@${data.username}`}</div>
         <div className="w-full border-b border-slate-400" />
+        <ProfileFeed userId={data.id} />
       </PageLayout>
     </>
   );
